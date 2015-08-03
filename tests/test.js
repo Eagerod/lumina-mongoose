@@ -8,7 +8,7 @@ var server = ts.server;
 var Entity = ts.Entity;
 
 function testRoute(test, route, expectStatusCode, expectBody) {
-    var testCount = 4;
+    var testCount = 6;
     test.expect(testCount);
     request({uri: "http://localhost:8080/fetch" + route, method: "GET"}, function(err, resp, body) {
         if ( typeof body === "string" && body.length > 0 ) { // Request is a finicky package.
@@ -18,6 +18,8 @@ function testRoute(test, route, expectStatusCode, expectBody) {
         test.equal(resp.statusCode, expectStatusCode);
         test.equal(expectBody.name, body.name);
         test.equal(expectBody._id, body._id);
+        test.equal(expectBody.code, body.code);
+        test.equal(expectBody.message, body.message);
         test.done();
     });
 }
@@ -48,10 +50,10 @@ module.exports = {
         });
     },
     "Entity not found": function(test) {
-        testRoute(test, "/507f1f77bcf86cd799439011", 404, {});
+        testRoute(test, "/507f1f77bcf86cd799439011", 404, {code: "NotFoundError", message: "Object of type Entity (507f1f77bcf86cd799439011) not found."});
     },
     "Invalid object Id": function(test) {
-        testRoute(test, "/abc123", 404, {});
+        testRoute(test, "/abc123", 404, {code: "NotFoundError", message: "Object of type Entity (abc123) not found."});
     },
     "Poorly constructed lumina function": function(test) {
         test.expect(1);

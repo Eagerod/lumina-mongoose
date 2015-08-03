@@ -26,7 +26,7 @@ function testRoute(test, route, expectStatusCode, expectBody) {
 
 module.exports = {
     setUp: function(done) {
-        mongoose.connect("mongodb://localhost:27017");
+        mongoose.connect("mongodb://localhost:27017/testdb");
         mongoose.connection.once("open", function() {
             server.listen(8080, function() {
                 done();
@@ -59,7 +59,7 @@ module.exports = {
         test.expect(1);
         test.throws(function() {
             ts.lumen.illuminate({
-                fetchObjectsFromRoute : {},
+                fetchObjectsFromRoute: {},
                 handler: function(req, res, next) {
                     res.send(200);
                     return next();

@@ -47,3 +47,4 @@ for ( var i = 0; i < routes.length; ++i ) {
 }
 
 module.exports.server = server;
+module.exports.lumen = lumen;

@@ -2,7 +2,6 @@
     "name": "lumina-mongoose",
     "description": "A lumina extension that adds predefined methods for fetching entities from route parameters in a Restify application.",
     "version": "0.0.1",
-    "private": true,
     "keywords": [
         "lumina",
         "mongoose",

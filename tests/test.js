@@ -7,6 +7,21 @@ var ts = require("./testServer");
 var server = ts.server;
 var Entity = ts.Entity;
 
+function testRoute(test, route, expectStatusCode, expectBody) {
+    var testCount = 4;
+    test.expect(testCount);
+    request({uri: "http://localhost:8080/fetch" + route, method: "GET"}, function(err, resp, body) {
+        if ( typeof body === "string" && body.length > 0 ) { // Request is a finicky package.
+            body = JSON.parse(body);
+        }
+        test.ifError(err);
+        test.equal(resp.statusCode, expectStatusCode);
+        test.equal(expectBody.name, body.name);
+        test.equal(expectBody._id, body._id);
+        test.done();
+    });
+}
+
 module.exports = {
     setUp: function(done) {
         mongoose.connect("mongodb://localhost:27017");
@@ -24,31 +39,18 @@ module.exports = {
         });
     },
     "Succeeds on non-running route": function(test) {
-        test.expect(3)
-        request({uri: "http://localhost:8080/fetch", method: "GET"}, function(err, resp, body) {
-            if ( typeof body === "string" && body.length > 0 ) { // Request is a finicky package.
-                body = JSON.parse(body);
-            }
-            test.ifError(err);
-            test.equal(resp.statusCode, 200);
-            test.deepEqual(body, {});
-            test.done();
-        });
+        testRoute(test, "", 200, {});
     },
     "Fetches entity from route": function(test) {
         var obj = new Entity({name: "abc"});
         obj.save(function(err) {
-            test.ifError(err);
-            request({uri: "http://localhost:8080/fetch/" + obj.id, method: "GET"}, function(err, resp, body) {
-                if ( typeof body === "string" && body.length > 0 ) { // Request is a finicky package.
-                    body = JSON.parse(body);
-                }
-                test.ifError(err);
-                test.equal(resp.statusCode, 200);
-                test.deepEqual(body.name, obj.name);
-                test.deepEqual(body._id, obj.id);
-                test.done();
-            });
+            testRoute(test, "/" + obj.id, 200, {name: "abc", _id: obj.id});
         });
+    },
+    "Entity not found": function(test) {
+        testRoute(test, "/507f1f77bcf86cd799439011", 404, {});
+    },
+    "Invalid object Id": function(test) {
+        testRoute(test, "/abc123", 404, {});
     }
 };

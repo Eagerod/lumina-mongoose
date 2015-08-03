@@ -43,7 +43,7 @@ module.exports = {
     },
     "Fetches entity from route": function(test) {
         var obj = new Entity({name: "abc"});
-        obj.save(function(err) {
+        obj.save(function() {
             testRoute(test, "/" + obj.id, 200, {name: "abc", _id: obj.id});
         });
     },

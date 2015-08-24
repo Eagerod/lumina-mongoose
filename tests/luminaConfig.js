@@ -1,11 +1,8 @@
 "use strict";
 
 var request = require("request");
-var mongoose = require("mongoose");
-var ts = require("./testServer");
 
-var server = ts.server;
-var Entity = ts.Entity;
+var Entity = require("./entity");
 
 function testRoute(test, route, expectStatusCode, expectBody) {
     var testCount = 6;
@@ -25,27 +22,16 @@ function testRoute(test, route, expectStatusCode, expectBody) {
 }
 
 module.exports = {
-    setUp: function(done) {
-        mongoose.connect("mongodb://localhost:27017/testdb");
-        mongoose.connection.once("open", function() {
-            server.listen(8080, function() {
-                done();
-            });
-        });
-    },
-    tearDown: function(done) {
-        mongoose.connection.close(function() {
-            server.close(function() {
-                done();
-            });
-        });
-    },
     "Succeeds on non-running route": function(test) {
         testRoute(test, "", 200, {});
     },
     "Fetches entity from route": function(test) {
         var obj = new Entity({name: "abc"});
-        obj.save(function() {
+        obj.save(function(err) {
+            if ( err ) {
+                console.log(err);
+                test.ok(false);
+            }
             testRoute(test, "/" + obj.id, 200, {name: "abc", _id: obj.id});
         });
     },
@@ -54,18 +40,5 @@ module.exports = {
     },
     "Invalid object Id": function(test) {
         testRoute(test, "/abc123", 404, {code: "NotFoundError", message: "Object of type Entity (abc123) not found."});
-    },
-    "Poorly constructed lumina function": function(test) {
-        test.expect(1);
-        test.throws(function() {
-            ts.lumen.illuminate({
-                fetchObjectsFromRoute: {},
-                handler: function(req, res, next) {
-                    res.send(200);
-                    return next();
-                }
-            });
-        });
-        test.done();
     }
 };

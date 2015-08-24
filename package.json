@@ -1,12 +1,13 @@
 {
     "name": "lumina-mongoose",
-    "description": "A lumina extension that adds predefined methods for fetching entities from route parameters in a Restify application.",
-    "version": "0.0.1",
+    "description": "A lumina extension that adds predefined methods for fetching entities from route parameters in a Restify/Express application.",
+    "version": "0.1.0",
     "keywords": [
         "lumina",
         "mongoose",
         "mongodb",
-        "restify"
+        "restify",
+        "express"
     ],
     "repository": { 
         "type": "git",
@@ -14,12 +15,14 @@
     },
     "dependencies": {
         "mongoose": "*",
-        "restify": "*",
         "async": "1.4.0"
     },
     "devDependencies": {
-        "request" : "2.55.0",
-        "lumina": "0.0.5",
+        "request": "2.55.0",
+        "restify": "4.0.0",
+        "express": "4.13.3",
+        "body-parser": "1.13.3",
+        "lumina": "0.1.0",
         "jsdoc": "3.3.2",
         "eslint": "0.24.1",
         "nodeunit": "0.9.1",
@@ -30,9 +33,9 @@
         "author": "hajial@gmail.com"
     },
     "scripts": {
-        "test": "./node_modules/.bin/nodeunit tests/test.js",
+        "test": "./node_modules/.bin/nodeunit tests/test*js",
         "docs": "./node_modules/.bin/jsdoc --recurse ./lib -d docs",
         "lint": "./node_modules/.bin/eslint .",
-        "coverage": "./node_modules/.bin/istanbul cover ./node_modules/.bin/nodeunit tests/test.js"
+        "coverage": "./node_modules/.bin/istanbul cover ./node_modules/.bin/nodeunit tests/test*js"
     }
 }

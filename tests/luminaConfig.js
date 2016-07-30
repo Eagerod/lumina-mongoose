@@ -82,5 +82,11 @@ module.exports.FetchQueryContext = {
             }
             testRoute(test, "abc", 200, [{name: "abc", _id: objs[0].id}]);
         });
+    },
+    "Datastore failure": function(test) {
+        mock(test, Entity, "find", function(query, cb) {
+            return cb(new Error("Failed to database"));
+        });
+        testRoute(test, "all", 500, {code: "InternalError", message: "Failed to database"});
     }
 };

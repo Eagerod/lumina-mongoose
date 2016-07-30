@@ -25,6 +25,7 @@
         "jsdoc": "3.3.2",
         "lumina": "0.1.0",
         "nodeunit": "0.9.1",
+        "nodeunit-mock": "0.0.4",
         "request": "2.55.0",
         "restify": "4.0.0"
     },

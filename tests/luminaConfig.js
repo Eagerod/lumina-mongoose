@@ -1,5 +1,6 @@
 "use strict";
 
+var mock = require("nodeunit-mock");
 var request = require("request");
 
 var Entity = require("./entity");
@@ -40,5 +41,11 @@ module.exports = {
     },
     "Invalid object Id": function(test) {
         testRoute(test, "/abc123", 404, {code: "NotFoundError", message: "Object of type Entity (abc123) not found."});
+    },
+    "Datastore failure": function(test) {
+        mock(test, Entity, "findOne", function(query, cb) {
+            return cb(new Error("Failed to database"));
+        });
+        testRoute(test, "/507f1f77bcf86cd799439011", 500, {code: "InternalError", message: "Failed to database"});
     }
 };

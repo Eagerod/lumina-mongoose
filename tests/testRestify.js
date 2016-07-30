@@ -7,7 +7,25 @@ var serverSetup = require("./configureServer");
 
 var server = restify.createServer({
     name: "Restify-Mongoose Server",
-    version: "1.0.0"
+    version: "1.0.0",
+    formatters: {
+        "application/json": function(req, res, body, cb) {
+            // Have to also set up a custom formatter for errors, since we want restify and express to behave
+            // simliarly enough that they can be tested with the same tests.
+            if (body instanceof Error) {
+                res.statusCode = 500;
+
+                body = {
+                    code: "InternalError",
+                    message: body.message
+                };
+            }
+            var data = JSON.stringify(body);
+            res.setHeader("Content-Length", Buffer.byteLength(data));
+
+            return cb(null, data);
+        }
+    }
 });
 
 server.use(restify.bodyParser());

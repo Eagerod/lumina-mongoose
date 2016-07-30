@@ -12,6 +12,10 @@ server.use(bodyParser.json());
 
 serverSetup(server);
 
+server.use(function(err, req, res, next) { // eslint-disable-line no-unused-vars
+    res.status(500).send({code: "InternalError", message: err.message});
+});
+
 module.exports = require("./luminaConfig");
 
 module.exports.setUp = function(done) {

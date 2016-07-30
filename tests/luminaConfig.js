@@ -1,5 +1,6 @@
 "use strict";
 
+var async = require("async");
 var mock = require("nodeunit-mock");
 var request = require("request");
 
@@ -22,7 +23,7 @@ function testRoute(test, route, expectStatusCode, expectBody) {
     });
 }
 
-module.exports = {
+module.exports.FetchContext = {
     "Succeeds on non-running route": function(test) {
         testRoute(test, "", 200, {});
     },
@@ -32,6 +33,7 @@ module.exports = {
             if ( err ) {
                 console.log(err);
                 test.ok(false);
+                return test.done();
             }
             testRoute(test, "/" + obj.id, 200, {name: "abc", _id: obj.id});
         });
@@ -47,5 +49,44 @@ module.exports = {
             return cb(new Error("Failed to database"));
         });
         testRoute(test, "/507f1f77bcf86cd799439011", 500, {code: "InternalError", message: "Failed to database"});
+    }
+};
+
+module.exports.FetchQueryContext = {
+    "Fetches entities from route": function(test) {
+        var objs = [];
+        objs.push(new Entity({name: "abc"}));
+        objs.push(new Entity({name: "123"}));
+        async.eachSeries(objs, function(obj, cb) {
+            obj.save(cb);
+        }, function(err) {
+            if ( err ) {
+                console.log(err);
+                test.ok(false);
+                return test.done();
+            }
+            testRoute(test, "all", 200, [{name: "abc", _id: objs[0].id}, {name: "123", _id: objs[1].id}]);
+        });
+    },
+    "Fetches actually applies query": function(test) {
+        var objs = [];
+        objs.push(new Entity({name: "abc"}));
+        objs.push(new Entity({name: "123"}));
+        async.eachSeries(objs, function(obj, cb) {
+            obj.save(cb);
+        }, function(err) {
+            if ( err ) {
+                console.log(err);
+                test.ok(false);
+                return test.done();
+            }
+            testRoute(test, "abc", 200, [{name: "abc", _id: objs[0].id}]);
+        });
+    },
+    "Datastore failure": function(test) {
+        mock(test, Entity, "find", function(query, cb) {
+            return cb(new Error("Failed to database"));
+        });
+        testRoute(test, "all", 500, {code: "InternalError", message: "Failed to database"});
     }
 };

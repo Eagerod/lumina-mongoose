@@ -8,6 +8,7 @@ var Entity = require("./entity");
 
 var lumen = new Lumina();
 lumen.use("fetchObjectsFromRoute", luminamongoose.fetchObjectsFromRoute());
+lumen.use("fetchObjectsFromQuery", luminamongoose.fetchObjectsFromQuery());
 
 function defaultHandler(req, res, next) {
     res.status(200);
@@ -27,6 +28,24 @@ function routes() {
         handler: function(req, res, next) {
             res.status(200);
             res.send(req._fetched || {});
+            return next();
+        }
+    }, {
+        method: "get",
+        path: "/fetchall",
+        fetchObjectsFromQuery: [new luminamongoose.FetchQueryContext({}, Entity, "_fetched")],
+        handler: function(req, res, next) {
+            res.status(200);
+            res.send(req._fetched || []);
+            return next();
+        }
+    }, {
+        method: "get",
+        path: "/fetchabc",
+        fetchObjectsFromQuery: [new luminamongoose.FetchQueryContext({name: "abc"}, Entity, "_fetched")],
+        handler: function(req, res, next) {
+            res.status(200);
+            res.send(req._fetched || []);
             return next();
         }
     }];
